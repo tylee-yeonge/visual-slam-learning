@@ -1,0 +1,275 @@
+# Week 5: 강체 변환 (Rigid Body Transformation)
+
+## 📌 개요
+
+**강체 변환(Rigid Body Transformation)**은 물체의 형태를 변형시키지 않고 위치와 방향만 바꾸는 변환입니다. 3D 공간에서 **회전(Rotation) + 평행이동(Translation)**을 결합한 것으로, SLAM에서 카메라나 로봇의 **포즈(Pose)**를 표현하는 핵심 개념입니다.
+
+이번 주에는 **SE(3) 변환 행렬**, **동차 좌표**, 그리고 **ROS TF2**와의 연결을 학습합니다.
+
+## 🎯 학습 목표
+
+1. SE(3) 변환 행렬의 구조 이해
+2. 동차 좌표(Homogeneous Coordinates)의 장점 이해
+3. 변환 행렬 합성과 역변환 계산
+4. ROS TF2와 변환 행렬의 관계 이해
+5. SLAM에서 키프레임 간 상대 포즈 표현
+
+## 📚 사전 지식
+
+- Week 4: 회전 표현 (회전 행렬, 쿼터니언)
+- 행렬 곱셈
+
+## ⏱️ 예상 학습 시간
+
+| 항목 | 시간 |
+|------|------|
+| 이론 학습 | 2시간 |
+| 실습 예제 | 2시간 |
+| ROS TF 연결 | 1-2시간 |
+| **총 소요시간** | **5-6시간** |
+
+---
+
+## 📖 핵심 개념
+
+### 1. SE(3) 변환 행렬
+
+#### 구조
+
+4×4 동차 변환 행렬:
+
+```
+T = [ R  | t ]  ∈ SE(3)
+    [----+---]
+    [ 0  | 1 ]
+
+여기서:
+- R: 3×3 회전 행렬 (SO(3))
+- t: 3×1 평행이동 벡터
+- SE(3): Special Euclidean Group (3D)
+```
+
+```python
+def make_transform(R, t):
+    """회전 행렬과 평행이동으로 SE(3) 생성"""
+    T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = t
+    return T
+```
+
+#### SE(3)의 자유도
+
+| 요소 | 자유도 | 설명 |
+|------|--------|------|
+| 회전 R | 3 | roll, pitch, yaw |
+| 평행이동 t | 3 | x, y, z |
+| **총합** | **6** | 6 DOF (Degrees of Freedom) |
+
+---
+
+### 2. 동차 좌표 (Homogeneous Coordinates)
+
+#### 왜 동차 좌표를 사용하는가?
+
+일반 좌표에서는:
+```
+p' = R @ p + t  (곱셈 + 덧셈 필요)
+```
+
+동차 좌표에서는:
+```
+p'_h = T @ p_h  (곱셈만으로 표현!)
+```
+
+**장점**:
+- 회전과 평행이동을 **행렬 곱셈 한 번**으로 처리
+- 변환 합성이 단순한 행렬 곱으로 표현
+- 투영 변환도 통일된 형태로 표현
+
+#### 3D 점의 동차 표현
+
+```python
+# 일반 좌표 → 동차 좌표
+p = np.array([x, y, z])
+p_h = np.array([x, y, z, 1])  # w=1 추가
+
+# 동차 좌표 → 일반 좌표
+p = p_h[:3] / p_h[3]  # w로 나누기
+```
+
+---
+
+### 3. 변환 연산
+
+#### 변환 합성
+
+```python
+# 연속 변환: 먼저 T1, 그 다음 T2 적용
+T_combined = T2 @ T1
+```
+
+> [!WARNING]
+> 변환 순서 주의! T2 @ T1 ≠ T1 @ T2
+
+#### 역변환
+
+```
+T⁻¹ = [ R^T | -R^T @ t ]
+      [-----+---------]
+      [  0  |    1     ]
+```
+
+```python
+def inverse_transform(T):
+    """SE(3) 역변환"""
+    R = T[:3, :3]
+    t = T[:3, 3]
+    
+    T_inv = np.eye(4)
+    T_inv[:3, :3] = R.T
+    T_inv[:3, 3] = -R.T @ t
+    return T_inv
+```
+
+---
+
+### 4. 좌표계 변환
+
+#### 월드 ↔ 카메라 변환
+
+```
+         월드 좌표계
+              │
+              │ T_cw (world → camera)
+              ▼
+         카메라 좌표계
+```
+
+```python
+# 월드 좌표의 점 → 카메라 좌표
+p_camera = T_cw @ p_world
+
+# 카메라 좌표의 점 → 월드 좌표
+p_world = T_wc @ p_camera  # T_wc = T_cw^(-1)
+```
+
+#### 상대 포즈
+
+키프레임 i와 j 사이의 상대 변환:
+
+```
+T_ij = T_j @ T_i⁻¹
+
+해석: i 기준으로 j가 어디 있는가
+```
+
+---
+
+## 🤖 SLAM에서의 활용
+
+### 카메라 포즈 표현
+
+```
+T_wc = [ R_wc | t_wc ]
+       [-----+-----]
+       [  0  |  1  ]
+
+- R_wc: 카메라 방향 (월드 기준)
+- t_wc: 카메라 위치 (월드 기준)
+```
+
+### 3D 점 투영
+
+```python
+def project_point(P_world, T_cw, K):
+    """3D 월드 점 → 2D 이미지 좌표"""
+    # 월드 → 카메라 변환
+    P_cam = T_cw @ np.append(P_world, 1)
+    P_cam = P_cam[:3]
+    
+    # 정규화 좌표
+    x_norm = P_cam[0] / P_cam[2]
+    y_norm = P_cam[1] / P_cam[2]
+    
+    # 픽셀 좌표
+    p = K @ np.array([x_norm, y_norm, 1])
+    return p[:2]
+```
+
+### ROS TF2 연결
+
+```python
+# geometry_msgs/Transform 구조
+# - translation: Vector3 (x, y, z)
+# - rotation: Quaternion (x, y, z, w)
+
+# SE(3) → TF2 메시지
+def se3_to_transform(T):
+    from geometry_msgs.msg import Transform, Vector3, Quaternion
+    
+    t = Transform()
+    t.translation = Vector3(x=T[0,3], y=T[1,3], z=T[2,3])
+    
+    q = rotation_matrix_to_quaternion(T[:3,:3])
+    t.rotation = Quaternion(x=q[1], y=q[2], z=q[3], w=q[0])
+    
+    return t
+```
+
+---
+
+## 📊 요약 표
+
+| 개념 | 크기 | 자유도 | 용도 |
+|------|------|--------|------|
+| 회전 행렬 R | 3×3 | 3 | 방향 표현 |
+| 쿼터니언 q | 4×1 | 3 | 방향 표현 |
+| 평행이동 t | 3×1 | 3 | 위치 표현 |
+| SE(3) 변환 T | 4×4 | 6 | 포즈 표현 |
+
+---
+
+## 💻 실습 파일
+
+| 파일 | 내용 |
+|------|------|
+| `se3_basics.py` | SE(3) 변환 행렬 생성 및 연산 |
+| `se3_quiz.py` | 주관식 퀴즈 |
+
+### 실행 방법
+
+```bash
+cd "Studies/Phase 1/week5"
+python3 se3_basics.py
+python3 se3_quiz.py
+```
+
+---
+
+## 🎬 추천 영상
+
+| 영상 | 설명 |
+|------|------|
+| [Cyrill Stachniss - SE(3)](https://www.youtube.com/watch?v=khGGoAAl1c4) | SE(3) 이론 |
+| [ROS TF Tutorial](http://wiki.ros.org/tf2/Tutorials) | TF2 사용법 |
+
+---
+
+## ✅ 학습 완료 체크리스트
+
+- [ ] 4×4 변환 행렬의 구조를 그릴 수 있다
+- [ ] 동차 좌표의 장점을 설명할 수 있다
+- [ ] 두 변환의 합성을 계산할 수 있다
+- [ ] 역변환 공식을 이해했다
+- [ ] ROS TF2 메시지와 SE(3)의 관계를 안다
+- [ ] 상대 포즈 T_ij = T_j @ T_i⁻¹ 의미를 이해했다
+
+---
+
+## 🔗 다음 단계
+
+Week 5 완료 후 → **Week 6: Lie 군/대수 기초**로 이동
+- 왜 over-parameterized인지
+- SE(3)의 접선 공간
+- 최적화에서의 활용
