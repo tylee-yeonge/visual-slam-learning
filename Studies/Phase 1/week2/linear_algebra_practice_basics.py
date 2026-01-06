@@ -321,7 +321,10 @@ print(f"고유값 (불확실성 크기): {eigenvalues}")
 print(f"고유벡터 (불확실성 방향):\n{eigenvectors}")
 
 # 불확실성 타원 매개변수
-# 95% 신뢰구간 (chi-squared 2 DOF에서 5.991)
+# 5.991은 카이제곱 분포(Chi-squared distribution)에서 유래한 값입니다.
+# - 자유도(DOF) = 2 (2차원 평면 x, y)
+# - 신뢰수준(Confidence) = 95% (데이터의 95%를 포함하는 범위)
+# - 즉, 2차원 정규분포에서 95% 확률 범위를 그리기 위한 스케일 계수입니다.
 scale = np.sqrt(5.991)
 print(f"\n95% 신뢰 타원 반지름:")
 print(f"  주축 방향: {scale * np.sqrt(eigenvalues[0]):.3f}")
