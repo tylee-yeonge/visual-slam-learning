@@ -485,54 +485,54 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import numpy as np
 
-# 데이터 (위에서 생성한 measurements 사용)
+# Data (using measurements generated above)
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-# 1. 행렬 곱셈의 기하학적 의미 시각화
+# 1. Geometric meaning of matrix multiplication
 ax1 = axes[0]
-# 원래 벡터들
+# Original vectors
 vectors = np.array([[1, 0], [0, 1], [1, 1]]).T
-# 변환 행렬
+# Transformation matrix
 A = np.array([[2, 1], [1, 2]])
-# 변환된 벡터들
+# Transformed vectors
 transformed = A @ vectors
 
 colors = ['red', 'blue', 'green']
 labels = ['e1', 'e2', 'e1+e2']
 for i in range(3):
     ax1.arrow(0, 0, vectors[0, i], vectors[1, i], head_width=0.1, 
-              color=colors[i], linestyle='--', alpha=0.5, label=f'원본 {labels[i]}')
+              color=colors[i], linestyle='--', alpha=0.5, label=f'Original {labels[i]}')
     ax1.arrow(0, 0, transformed[0, i], transformed[1, i], head_width=0.1,
-              color=colors[i], label=f'변환 {labels[i]}')
+              color=colors[i], label=f'Transformed {labels[i]}')
 
 ax1.set_xlim(-1, 4)
 ax1.set_ylim(-1, 4)
 ax1.set_aspect('equal')
 ax1.grid(True)
 ax1.legend()
-ax1.set_title('행렬 변환의 기하학적 의미')
+ax1.set_title('Geometric Meaning of Matrix Transformation')
 
-# 2. 공분산 행렬과 불확실성 타원
+# 2. Covariance matrix and uncertainty ellipse
 ax2 = axes[1]
-# 측정점들 플롯
-ax2.scatter(measurements[:, 0], measurements[:, 1], alpha=0.3, s=5, label='측정값')
-ax2.scatter(*true_position, color='red', s=100, marker='x', label='실제 위치')
+# Plot measurement points
+ax2.scatter(measurements[:, 0], measurements[:, 1], alpha=0.3, s=5, label='Measurements')
+ax2.scatter(*true_position, color='red', s=100, marker='x', label='True Position')
 
-# 불확실성 타원 그리기
+# Draw uncertainty ellipse
 angle = np.degrees(np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0]))
-for n_std in [1, 2, 3]:  # 1, 2, 3 표준편차
+for n_std in [1, 2, 3]:  # 1, 2, 3 standard deviations
     width = 2 * n_std * np.sqrt(eigenvalues[0])
     height = 2 * n_std * np.sqrt(eigenvalues[1])
     ellipse = Ellipse(true_position, width, height, angle=angle,
                      fill=False, color=f'C{n_std}', linewidth=2,
-                     label=f'{n_std}σ 타원')
+                     label=f'{n_std}sigma Ellipse')
     ax2.add_patch(ellipse)
 
 ax2.set_xlabel('X')
 ax2.set_ylabel('Y')
 ax2.set_aspect('equal')
 ax2.legend()
-ax2.set_title('공분산 행렬의 불확실성 타원')
+ax2.set_title('Uncertainty Ellipse from Covariance Matrix')
 
 plt.tight_layout()
 plt.savefig('linear_algebra_visualization.png', dpi=150)
