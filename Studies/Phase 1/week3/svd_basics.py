@@ -53,6 +53,12 @@ print(rect_A)
 # full_matrices=True: U와 V를 완전한 정방 직교 행렬로 반환
 # full_matrices=False: 축소된(reduced/economy) SVD 반환 (메모리 효율적)
 U_rect, S_rect, Vt_rect = np.linalg.svd(rect_A, full_matrices=True)
+
+# 💡 변수명의 의미:
+#    U  = Unitary matrix (유니터리/직교 행렬)
+#    S  = Singular values (특이값들, 1D 배열로 반환)
+#    Vt = V transpose (V의 전치행렬, 수식 Vᵀ와 직접 대응)
+
 print(f"\n고유값 분해? → 불가능! (정방 행렬이 아님)")
 print(f"SVD 분해? → 가능!")
 print(f"  A 크기: {rect_A.shape}")
@@ -313,6 +319,76 @@ print("   - 조건수(condition number) = σ_max / σ_min")
 cond = s1[0] / s1[-1]
 print(f"\n행렬 1의 조건수: {cond:.4f}")
 
+# 조건수 비교 실습
+print("\n--- 조건수와 수치 안정성 ---")
+print("""
+💡 조건수(Condition Number)란?
+   κ(A) = σ_max / σ_min (가장 큰 특이값 / 가장 작은 특이값)
+   
+   의미: 입력 오차가 출력 오차로 얼마나 증폭되는가?
+   - κ ≈ 1: 매우 안정 (작은 오차도 작게 유지)
+   - κ > 1000: 불안정 (작은 오차가 크게 증폭됨)
+   - κ → ∞: 거의 특이 행렬
+""")
+
+# 안정한 행렬 (조건수 작음)
+A_stable = np.array([
+    [1, 0],
+    [0, 1]
+])
+
+# 불안정한 행렬 (조건수 큼)
+A_unstable = np.array([
+    [1, 1],
+    [1, 1.0001]
+])
+
+print("안정한 행렬 (단위행렬):") 
+print(A_stable)
+_, s_stable, _ = np.linalg.svd(A_stable)
+cond_stable = s_stable[0] / s_stable[-1]
+print(f"  특이값: {s_stable}")
+print(f"  조건수: κ = {cond_stable:.2f} ✅ (안정)")
+
+print("\n불안정한 행렬 (거의 선형 종속):") 
+print(A_unstable)
+_, s_unstable, _ = np.linalg.svd(A_unstable)
+cond_unstable = s_unstable[0] / s_unstable[-1]
+print(f"  특이값: {s_unstable}")
+print(f"  조건수: κ = {cond_unstable:.2f} ⚠️ (불안정)")
+
+# 입력 오차의 증폭 시뮬레이션
+print("\n--- 입력 오차 증폭 비교 ---")
+b_exact = np.array([2.0, 2.0])
+b_noisy = b_exact + np.array([0.001, 0.001])  # 0.1% 오차
+
+x_exact_stable = np.linalg.solve(A_stable, b_exact)
+x_noisy_stable = np.linalg.solve(A_stable, b_noisy)
+
+print(f"안정한 행렬:")
+print(f"  정확한 해: {x_exact_stable}")
+print(f"  노이즈 해: {x_noisy_stable}")
+error_stable = np.linalg.norm(x_noisy_stable - x_exact_stable)
+print(f"  해의 차이: {error_stable:.6f} ✅ (작음)")
+
+x_exact_unstable = np.linalg.solve(A_unstable, b_exact) 
+x_noisy_unstable = np.linalg.solve(A_unstable, b_noisy)
+
+print(f"\n불안정한 행렬:")
+print(f"  정확한 해: {x_exact_unstable}")
+print(f"  노이즈 해: {x_noisy_unstable}")
+error_unstable = np.linalg.norm(x_noisy_unstable - x_exact_unstable)
+print(f"  해의 차이: {error_unstable:.6f} ⚠️ (큼!)")
+
+print(f"\n오차 증폭 비율: {error_unstable / error_stable:.0f}배")
+
+print("""
+🎯 SLAM에서의 의미:
+   - 카메라 캘리브레이션, Essential Matrix 계산 시
+   - 조건수가 크면 작은 측정 오차가 큰 추정 오차로!
+   - SVD는 조건수가 큰 경우에도 안정적으로 해를 구할 수 있음
+""")
+
 # ============================================================
 # Part 4: 최소자승 해 (Least Squares with SVD)
 # ============================================================
@@ -351,9 +427,43 @@ print(f"\n두 방법 결과 일치: {np.allclose(x_lstsq, x_svd)}")
 
 # 예측값과 잔차
 y_pred = A_ls @ x_lstsq
-print(f"\n예측값: {y_pred}")
-print(f"잔차: {b_ls - y_pred}")
-print(f"잔차 제곱합: {np.sum((b_ls - y_pred)**2):.6f}")
+residual = b_ls - y_pred
+
+print("\n--- 잔차 상세 분석 ---")
+print("""
+💡 잔차(Residual)란?
+   잔차 = 실제값 - 예측값 = y - ŷ
+   
+   의미:
+   - 양수: 모델이 과소 예측 (실제가 더 큼)
+   - 음수: 모델이 과대 예측 (예측이 더 큼)
+   - 0에 가까울수록 좋은 예측
+""")
+
+print("\n각 데이터 포인트의 예측과 잔차:")
+print(f"{'x':<8} {'실제(y)':<12} {'예측(ŷ)':<12} {'잔차':<12} {'해석':<20}")
+print("-" * 70)
+x_values = [1, 2, 3, 4]
+for i, (x, y_actual, y_pred_val, res) in enumerate(zip(x_values, b_ls, y_pred, residual)):
+    interpretation = "과소예측" if res > 0 else "과대예측" if res < 0 else "정확"
+    sign = "+" if res >= 0 else ""
+    print(f"{x:<8} {y_actual:<12.2f} {y_pred_val:<12.2f} {sign}{res:<11.3f} {interpretation}")
+
+print(f"\n성능 지표:")
+rss = np.sum(residual**2)
+rmse = np.sqrt(np.mean(residual**2))
+mae = np.mean(np.abs(residual))
+
+print(f"  RSS (잔차 제곱합):     {rss:.6f}")
+print(f"  RMSE (평균제곱근오차): {rmse:.6f}")
+print(f"  MAE (평균절대오차):    {mae:.6f}")
+
+print("""
+🎯 잔차 분석의 활용:
+   - 이상치(outlier) 탐지: 큰 잔차를 가진 점
+   - 모델 품질 평가: 잔차가 작을수록 좋은 모델
+   - SLAM에서: 재투영 오차(reprojection error)로 활용
+""")
 
 print("\n💡 SVD의 최소자승 해 공식:")
 print("   x = A⁺b = V Σ⁺ Uᵀ b")
@@ -442,6 +552,99 @@ print("\n💡 Essential Matrix 분해 핵심:")
 print("   - E = U diag(σ,σ,0) Vᵀ 형태")
 print("   - R은 4가지 후보 (2개 R × 2개 t 부호)")
 print("   - 실제 사용 시 'cheirality check'로 올바른 해 선택")
+
+# 에피폴라 제약 검증
+print("\n--- 에피폴라 제약(Epipolar Constraint) 검증 ---")
+print("""
+💡 에피폴라 제약이란?
+   두 이미지의 대응점 p₁, p₂는 다음을 만족해야 함:
+   p₂ᵀ · E · p₁ = 0
+   
+   의미: p₂는 p₁의 에피폴라 라인 위에 있어야 함
+""")
+
+# 예제 대응점 (동차 좌표)
+p1 = np.array([100, 150, 1])
+p2 = np.array([120, 160, 1])
+
+# 에피폴라 제약 계산
+constraint = p2.T @ E_example @ p1
+
+print(f"대응점 1 (이미지1): {p1[:2]}")
+print(f"대응점 2 (이미지2): {p2[:2]}")
+print(f"\np₂ᵀ · E · p₁ = {constraint:.6f}")
+print(f"0에 가까운가? {np.abs(constraint) < 0.01} (이상적으로 정확히 0)")
+
+# 에피폴라 라인 계산
+epipolar_line = E_example @ p1
+print(f"\n에피폴라 라인 l₂ = E · p₁: {epipolar_line}")
+print(f"p₂가 이 라인 위에 있는가? p₂ · l₂ = {p2 @ epipolar_line:.6f}")
+
+print("""
+🎯 SLAM에서의 활용:
+   - 대응점 검증: 잘못된 매칭 제거
+   - 탐색 범위 축소: 2D 영역 → 1D 라인
+   - RANSAC으로 이상치(outlier) 제거
+""")
+
+# Cheirality Check 실습
+print("\n--- Cheirality Check (키랄리티 체크) ---")
+print("""
+💡 Cheirality Check란?
+   4개의 (R, t) 후보 중 올바른 해를 선택하는 방법
+   
+   조건: 복원된 3D 점이 두 카메라 모두 앞에 있어야 함
+         (양수 깊이 = positive depth)
+""")
+
+# 4가지 후보 생성
+R1 = U_e @ W @ Vt_e
+R2 = U_e @ W.T @ Vt_e
+t1 = U_e[:, 2]
+t2 = -t1
+
+# det(R) = +1 보장
+if np.linalg.det(R1) < 0:
+    R1 = -R1
+if np.linalg.det(R2) < 0:
+    R2 = -R2
+
+candidates = [
+    (R1, t1, "R1, +t"),
+    (R1, t2, "R1, -t"),
+    (R2, t1, "R2, +t"),
+    (R2, t2, "R2, -t")
+]
+
+print(f"\n총 4가지 후보:")
+for i, (R, t, name) in enumerate(candidates, 1):
+    print(f"  {i}. {name}: det(R) = {np.linalg.det(R):.4f}")
+
+# 간단한 3D 점 예제 (카메라1 기준)
+X_cam1 = np.array([0, 0, 5])  # Z=5 (카메라 앞)
+
+print(f"\n예제 3D 점 (카메라1 기준): {X_cam1}")
+print(f"카메라1에서 깊이: Z₁ = {X_cam1[2]} (양수 = 앞)")
+
+print("\n각 후보에 대한 Cheirality Check:")
+for i, (R, t, name) in enumerate(candidates, 1):
+    # 카메라2 좌표계로 변환: X_cam2 = R @ X_cam1 + t
+    X_cam2 = R @ X_cam1 + t
+    depth1 = X_cam1[2]
+    depth2 = X_cam2[2]
+    
+    valid = "✅" if (depth1 > 0 and depth2 > 0) else "❌"
+    print(f"\n후보 {i} ({name}):")
+    print(f"  카메라1 깊이: Z₁ = {depth1:.2f}")
+    print(f"  카메라2 깊이: Z₂ = {depth2:.2f}")
+    print(f"  두 카메라 모두 앞? {valid}")
+
+print("""
+🎯 실전에서:
+   1. 여러 3D 점에 대해 체크
+   2. 모든 점(또는 대부분)이 두 카메라 앞에 있는 후보 선택
+   3. 보통 4개 중 1개만 조건을 만족
+""")
 
 # ============================================================
 # Part 7: 저랭크 근사 (이미지 압축 개념)
