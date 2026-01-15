@@ -11,55 +11,55 @@
 ### Week 1: 3Blue1Brown으로 직관 얻기
 
 #### Essence of Linear Algebra 시청
-- [ ] Chapter 1: Vectors (벡터란 무엇인가)
-- [ ] Chapter 2: Linear combinations, span, basis
-- [ ] Chapter 3: Linear transformations and matrices
-- [ ] Chapter 4: Matrix multiplication as composition
-- [ ] Chapter 5: Three-dimensional linear transformations
-- [ ] Chapter 6: The determinant
-- [ ] Chapter 7: Inverse matrices, column space and null space
-- [ ] Chapter 8: Nonsquare matrices
-- [ ] Chapter 9: Dot products and duality
-- [ ] Chapter 10: Cross products
-- [ ] Chapter 11: Cross products in the light of linear transformations
-- [ ] Chapter 12: Cramer's rule
-- [ ] Chapter 13: Change of basis
-- [ ] Chapter 14: Eigenvectors and eigenvalues
-- [ ] Chapter 15: Abstract vector spaces
+- [x] Chapter 1: Vectors (벡터란 무엇인가)
+- [x] Chapter 2: Linear combinations, span, basis
+- [x] Chapter 3: Linear transformations and matrices
+- [x] Chapter 4: Matrix multiplication as composition
+- [x] Chapter 5: Three-dimensional linear transformations
+- [x] Chapter 6: The determinant
+- [x] Chapter 7: Inverse matrices, column space and null space
+- [x] Chapter 8: Nonsquare matrices
+- [x] Chapter 9: Dot products and duality
+- [x] Chapter 10: Cross products
+- [x] Chapter 11: Cross products in the light of linear transformations
+- [x] Chapter 12: Cramer's rule
+- [x] Chapter 13: Change of basis
+- [x] Chapter 14: Eigenvectors and eigenvalues
+- [x] Chapter 15: Abstract vector spaces
 
 #### 핵심 개념 정리
-- [ ] "행렬 = 선형 변환" 이해했는지 자체 점검
-- [ ] 고유값/고유벡터가 왜 중요한지 정리
-- [ ] 내적의 기하학적 의미 정리
+- [x] "행렬 = 선형 변환" 이해했는지 자체 점검
+- [x] 고유값/고유벡터가 왜 중요한지 정리
+- [x] 내적의 기하학적 의미 정리
 
 ### Week 2: 실습으로 확인
 
 #### NumPy/Eigen 기본 연산
-- [ ] 행렬 곱셈 직접 계산 vs 라이브러리 비교
-- [ ] 역행렬 계산
-- [ ] 고유값 분해 실습
-- [ ] 행렬식 계산
+- [x] 행렬 곱셈 직접 계산 vs 라이브러리 비교
+- [x] 역행렬 계산
+- [x] 고유값 분해 실습
+- [x] 행렬식 계산
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] 회전 행렬이 직교 행렬인 이유 이해
-- [ ] 왜 회전 행렬의 행렬식 = 1인지 확인
-- [ ] 공분산 행렬과 불확실성 표현 (칼만 필터 예고)
+- [x] 회전 행렬이 직교 행렬인 이유 이해
+- [x] 왜 회전 행렬의 행렬식 = 1인지 확인
+- [x] 공분산 행렬과 불확실성 표현 (칼만 필터 예고)
 
 ### Week 3: SVD 집중
 
 #### SVD 이해
-- [ ] SVD의 기하학적 의미 (회전-스케일-회전)
-- [ ] 특이값의 의미
-- [ ] SVD를 이용한 최소자승 해 구하기
+- [x] SVD의 기하학적 의미 (회전-스케일-회전)
+- [x] 특이값의 의미
+- [x] SVD를 이용한 최소자승 해 구하기
 
 #### SVD 실습
-- [ ] NumPy/Eigen으로 SVD 분해
-- [ ] 이미지 압축에 SVD 적용 (선택)
+- [x] NumPy/Eigen으로 SVD 분해
+- [x] 이미지 압축에 SVD 적용 (선택)
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] Essential Matrix에서 R, t 추출할 때 SVD 사용
-- [ ] Homography 분해에서 SVD 사용
-- [ ] PnP 문제의 해법에서 SVD 사용
+- [x] Essential Matrix에서 R, t 추출할 때 SVD 사용
+- [x] Homography 분해에서 SVD 사용
+- [x] PnP 문제의 해법에서 SVD 사용
 
 ### 🔍 Section 1.1 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
@@ -75,27 +75,27 @@
 ### Week 4: 회전 표현
 
 #### 회전 행렬 (Rotation Matrix)
-- [ ] 2D 회전 행렬 유도
-- [ ] 3D 회전 행렬 (Rx, Ry, Rz)
-- [ ] 회전 행렬의 성질 (직교, 행렬식=1)
-- [ ] 회전 순서에 따른 결과 차이 (비가환성)
+- [x] 2D 회전 행렬 유도
+- [x] 3D 회전 행렬 (Rx, Ry, Rz)
+- [x] 회전 행렬의 성질 (직교, 행렬식=1)
+- [x] 회전 순서에 따른 결과 차이 (비가환성)
 
 #### 오일러 각 (Euler Angles)
-- [ ] Roll-Pitch-Yaw 정의
-- [ ] 짐벌락 문제 이해
-- [ ] 왜 오일러 각만으로는 부족한지
+- [x] Roll-Pitch-Yaw 정의
+- [x] 짐벌락 문제 이해
+- [x] 왜 오일러 각만으로는 부족한지
 
 #### 쿼터니언 (Quaternion)
-- [ ] 쿼터니언 기본 정의 (w, x, y, z)
-- [ ] 쿼터니언 곱셈
-- [ ] 쿼터니언 → 회전 행렬 변환
-- [ ] 회전 행렬 → 쿼터니언 변환
-- [ ] SLERP (구면 선형 보간) 개념
+- [x] 쿼터니언 기본 정의 (w, x, y, z)
+- [x] 쿼터니언 곱셈
+- [x] 쿼터니언 → 회전 행렬 변환
+- [x] 회전 행렬 → 쿼터니언 변환
+- [x] SLERP (구면 선형 보간) 개념
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] VINS-Fusion은 쿼터니언으로 회전 표현
-- [ ] IMU 적분 시 쿼터니언 사용 (짐벌락 방지)
-- [ ] 최적화 시 쿼터니언의 단위 제약 처리
+- [x] VINS-Fusion은 쿼터니언으로 회전 표현
+- [x] IMU 적분 시 쿼터니언 사용 (짐벌락 방지)
+- [x] 최적화 시 쿼터니언의 단위 제약 처리
 
 ### Week 5: 강체 변환
 
