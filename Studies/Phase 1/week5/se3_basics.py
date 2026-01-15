@@ -39,14 +39,43 @@ print("""
 """)
 
 # ----- 1.1 기본 함수 정의 -----
+
+# 각 축 회전 함수들
+def rotation_x(theta):
+    """X축 회전 행렬 생성 (roll)"""
+    c, s = np.cos(theta), np.sin(theta)
+    return np.array([
+        [1,  0,  0],
+        [0,  c, -s],
+        [0,  s,  c]
+    ])
+
+def rotation_y(theta):
+    """Y축 회전 행렬 생성 (pitch)"""
+    c, s = np.cos(theta), np.sin(theta)
+    return np.array([
+        [ c,  0,  s],
+        [ 0,  1,  0],
+        [-s,  0,  c]
+    ])
+
 def rotation_z(theta):
-    """Z축 회전 행렬 생성"""
+    """Z축 회전 행렬 생성 (yaw)"""
     c, s = np.cos(theta), np.sin(theta)
     return np.array([
         [c, -s, 0],
         [s,  c, 0],
         [0,  0, 1]
     ])
+
+def rotation_euler(roll, pitch, yaw):
+    """오일러 각으로 복합 회전 행렬 생성
+    
+    순서: Z-Y-X (yaw-pitch-roll)
+    R = Rz(yaw) @ Ry(pitch) @ Rx(roll)
+    """
+    return rotation_z(yaw) @ rotation_y(pitch) @ rotation_x(roll)
+
 
 def make_se3(R, t):
     """SE(3) 변환 행렬 생성
@@ -97,6 +126,44 @@ print("""
    | 이동 t | 3 | x, y, z |
    | 총합   | 6 | 6-DOF 포즈 |
 """)
+
+# ----- 1.4 복합 회전 예제 -----
+print("\n----- 1.4 복합 회전 (multiple axes) -----")
+
+print("""
+💡 실제 SLAM에서는 모든 축의 회전을 사용합니다!
+   - Roll (X축): 카메라가 옆으로 기울어짐
+   - Pitch (Y축): 카메라가 위아래로 기울어짐  
+   - Yaw (Z축): 카메라가 좌우로 회전
+""")
+
+# 각 축 개별 회전 예제
+print("\n[개별 축 회전 예제]")
+R_x = rotation_x(np.radians(30))
+print(f"X축 30도 회전:\n{R_x}\n")
+
+R_y = rotation_y(np.radians(20))
+print(f"Y축 20도 회전:\n{R_y}\n")
+
+R_z = rotation_z(np.radians(45))
+print(f"Z축 45도 회전:\n{R_z}\n")
+
+# 복합 회전 예제 (Euler angles)
+print("[복합 회전: Roll=10°, Pitch=15°, Yaw=30°]")
+roll = np.radians(10)
+pitch = np.radians(15)
+yaw = np.radians(30)
+
+R_euler = rotation_euler(roll, pitch, yaw)
+print(f"복합 회전 행렬:\n{R_euler}\n")
+
+# SE(3) 변환에 복합 회전 사용
+t_complex = np.array([1, 2, 3])
+T_complex = make_se3(R_euler, t_complex)
+print(f"복합 회전 + 평행이동 SE(3):\n{T_complex}\n")
+
+print("💡 어떤 회전 행렬이든 SE(3)의 R로 사용 가능!")
+
 
 # ============================================================
 # Part 2: 동차 좌표 (Homogeneous Coordinates)
