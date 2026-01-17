@@ -138,17 +138,31 @@ print("""
 """)
 
 # 각 축 개별 회전 예제
-print("\n[개별 축 회전 예제]")
+print("\n[Step 1: 개별 축 회전 예제]")
+print("각 축을 독립적으로 회전시켜봅시다:")
+
 R_x = rotation_x(np.radians(30))
-print(f"X축 30도 회전:\n{R_x}\n")
+print(f"\n① X축 30도 회전 (= Roll):\n{R_x}")
+print("   → 카메라가 옆으로 30도 기울어짐 🔄")
 
 R_y = rotation_y(np.radians(20))
-print(f"Y축 20도 회전:\n{R_y}\n")
+print(f"\n② Y축 20도 회전 (= Pitch):\n{R_y}")
+print("   → 카메라가 위아래로 20도 기울어짐 ↕️")
 
 R_z = rotation_z(np.radians(45))
-print(f"Z축 45도 회전:\n{R_z}\n")
+print(f"\n③ Z축 45도 회전 (= Yaw):\n{R_z}")
+print("   → 카메라가 좌우로 45도 회전 ↔️")
+
+print("\n" + "─" * 50)
+print("💡 용어 정리:")
+print("   • rotation_x(θ) = Roll(θ)   - X축 회전")
+print("   • rotation_y(θ) = Pitch(θ)  - Y축 회전")
+print("   • rotation_z(θ) = Yaw(θ)    - Z축 회전")
+print("─" * 50)
 
 # 복합 회전 예제 (Euler angles)
+print("\n[Step 2: 복합 회전 - 세 축을 동시에!]")
+print("이제 Roll, Pitch, Yaw를 모두 조합해봅시다:")
 print("[복합 회전: Roll=10°, Pitch=15°, Yaw=30°]")
 roll = np.radians(10)
 pitch = np.radians(15)
@@ -190,7 +204,13 @@ def from_homogeneous(p_h):
 # ----- 2.1 일반 좌표 vs 동차 좌표 -----
 print("\n----- 2.1 두 가지 변환 방법 비교 -----")
 
+# 예제용 변환 정의: Z축 45도 회전 + (2, 1, 0) 이동
+R = rotation_z(np.radians(45))
+t = np.array([2, 1, 0])
+T = make_se3(R, t)
+
 p = np.array([1, 0, 0])  # 테스트 점
+print(f"변환: Z축 45도 회전 + 이동 {t}")
 print(f"원점 p = {p}")
 
 # 방법 1: 일반 좌표 (덧셈 필요)
@@ -341,33 +361,78 @@ print("""
 # ----- 4.1 월드 ↔ 카메라 변환 -----
 print("\n----- 4.1 월드 ↔ 카메라 변환 -----")
 
+print("""
+💡 T_wc vs T_cw: 헷갈리기 쉬운 부분!
+
+   T_wc (카메라→월드 변환):
+   ├─ 포즈 의미: "카메라가 월드에서 어디 있는지"
+   └─ 변환 의미: "카메라 좌표의 점 → 월드 좌표로 변환"
+      예) T_wc @ [0,0,0,1] = 카메라 위치(월드 좌표)
+   
+   T_cw (월드→카메라 변환):
+   ├─ T_wc의 역변환
+   └─ 변환 의미: "월드 좌표의 점 → 카메라 좌표로 변환"
+      예) T_cw @ p_world = 카메라가 보는 점 위치
+      
+   ⭐ 기억법: 아래첨자가 변환 방향!
+      T_wc: c(카메라) → w(월드)
+      T_cw: w(월드) → c(카메라)
+""")
+
 # 카메라 포즈: 월드에서 (2, 0, 0) 위치, 90도 왼쪽 회전
 R_wc = rotation_z(np.radians(90))
 t_wc = np.array([2, 0, 0])
-T_wc = make_se3(R_wc, t_wc)  # 카메라의 포즈 (월드 기준)
+T_wc = make_se3(R_wc, t_wc)
 
-print("T_wc: 카메라 포즈 (월드 좌표계 기준)")
-print(f"  위치: (2, 0, 0)")
-print(f"  방향: Z축 90도 회전 (왼쪽을 봄)")
+print("=" * 50)
+print("【설정】 카메라 포즈")
+print("=" * 50)
+print(f"  월드 기준 위치: (2, 0, 0)")
+print(f"  월드 기준 방향: Z축 90도 회전 (왼쪽을 봄)")
+print(f"\nT_wc (카메라→월드 변환):\n{T_wc}")
+
+# 검증: 카메라 좌표계 원점을 월드로 변환
+camera_origin = np.array([0, 0, 0, 1])
+camera_pos_in_world = T_wc @ camera_origin
+print(f"\n✅ 검증: T_wc @ [0,0,0,1] = {camera_pos_in_world[:3]}")
+print(f"   → 카메라 원점이 월드에서 (2, 0, 0)에 위치!")
 
 # 월드 → 카메라 변환
-T_cw = inverse_se3(T_wc)  # 역변환!
+T_cw = inverse_se3(T_wc)
 
-print("\nT_cw = T_wc⁻¹: 월드→카메라 변환")
+print("\n" + "=" * 50)
+print("【역변환】 월드→카메라 변환")
+print("=" * 50)
+print(f"T_cw = T_wc⁻¹ (월드→카메라 변환):\n{T_cw}")
 
 # 월드 좌표의 점을 카메라 좌표로
 p_world = np.array([5, 0, 0, 1])
 p_camera = T_cw @ p_world
 
-print(f"\n월드 좌표 점: {p_world[:3]}")
-print(f"카메라 좌표 점: {p_camera[:3]}")
+print("\n" + "=" * 50)
+print("【예제】 점 변환")
+print("=" * 50)
+print(f"월드 좌표의 점: {p_world[:3]}")
+print(f"↓ T_cw 적용 (월드→카메라)")
+print(f"카메라 좌표의 점: {p_camera[:3]}")
 
 print("""
 💡 결과 해석:
-   월드에서 (5, 0, 0)에 있는 점이
-   카메라(90도 왼쪽을 봄) 입장에서는
-   카메라 앞쪽(Y 방향)에 보임!
+   월드에서 (5, 0, 0)에 있는 점
+   → 카메라는 (2, 0, 0)에서 90도 왼쪽을 보고 있음
+   → 카메라가 보기엔 그 점이 Y축 방향(앞쪽) 3m 거리!
+   
+   왜 3m? (5 - 2 = 3, 그리고 90도 회전했으므로 X→Y)
 """)
+
+# 반대 방향도 확인
+print("\n【반대 방향 검증】")
+p_cam_local = np.array([0, -3, 0, 1])  # 카메라 기준 뒤쪽 3m
+p_world_back = T_wc @ p_cam_local
+print(f"카메라 뒤쪽 3m 지점 (카메라 좌표): {p_cam_local[:3]}")
+print(f"↓ T_wc 적용 (카메라→월드)")  
+print(f"월드 좌표로 변환: {p_world_back[:3]}")
+print(f"✅ 같은 점! {np.allclose(p_world[:3], p_world_back[:3])}")
 
 # ----- 4.2 상대 포즈 -----  
 print("\n----- 4.2 상대 포즈 -----")
