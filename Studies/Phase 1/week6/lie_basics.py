@@ -559,7 +559,7 @@ ax2.set_xlabel('X'); ax2.set_ylabel('Y'); ax2.set_zlabel('Z')
 ax2.set_xlim([-1.5, 1.5]); ax2.set_ylim([-1.5, 1.5]); ax2.set_zlim([-1.5, 1.5])
 
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 1/week6/rotation_visualization.png', dpi=150)
+plt.savefig('rotation_visualization.png', dpi=150)
 print("\nVisualization saved: rotation_visualization.png")
 print("→ Red(X-axis), Green(Y-axis), Blue(Z-axis)")
 

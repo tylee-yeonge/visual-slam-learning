@@ -368,7 +368,7 @@ plt.xlabel('Iteration', fontsize=12)
 plt.ylabel('Error (log scale)', fontsize=12)
 plt.title('Rotation Optimization Convergence', fontsize=14)
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 1/week6/optimization_convergence.png', dpi=150)
+plt.savefig('optimization_convergence.png', dpi=150)
 print(f"\n수렴 그래프 저장: optimization_convergence.png")
 
 # ============================================================
@@ -525,7 +525,7 @@ plt.xlabel('Iteration', fontsize=12)
 plt.ylabel('Mean Error (log scale)', fontsize=12)
 plt.title('ICP Convergence', fontsize=14)
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 1/week6/icp_convergence.png', dpi=150)
+plt.savefig('icp_convergence.png', dpi=150)
 print(f"ICP 수렴 그래프 저장: icp_convergence.png")
 
 # 3D 시각화
@@ -551,7 +551,7 @@ ax2.set_xlabel('X'); ax2.set_ylabel('Y'); ax2.set_zlabel('Z')
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 1/week6/icp_result.png', dpi=150)
+plt.savefig('icp_result.png', dpi=150)
 print(f"ICP 결과 시각화 저장: icp_result.png\n")
 
 # ============================================================
