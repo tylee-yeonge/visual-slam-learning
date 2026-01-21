@@ -280,9 +280,9 @@ def log_so3(R):
     Returns:
         omega: 3D 벡터 (회전축 × 각도)
     """
-    # 회전 각도 계산
-    trace = np.trace(R)
-    cos_theta = (trace - 1) / 2
+    # 회전 각도 계산 (tr(R) = 1 + 2cos(θ) 공식 사용)
+    trace = np.trace(R)  # 대각합: R[0,0] + R[1,1] + R[2,2]로 회전 각도 θ를 추출
+    cos_theta = (trace - 1) / 2  # tr(R) = 1 + 2cos(θ) → cos(θ) 계산
     cos_theta = np.clip(cos_theta, -1, 1)  # 수치 안정성
     theta = np.arccos(cos_theta)
     
@@ -457,8 +457,8 @@ def exp_se3(xi):
     Returns:
         T: 4×4 변환 행렬
     """
-    rho = xi[:3]  # 평행이동 관련
-    phi = xi[3:]  # 회전
+    rho = xi[:3]  # ρ (rho, 그리스 문자): 평행이동 파라미터 (실제 t는 J @ rho로 계산)
+    phi = xi[3:]  # φ (phi, 그리스 문자): 회전 파라미터 (R = exp(phi))
     
     # 1. 회전 부분
     R = exp_so3(phi)
