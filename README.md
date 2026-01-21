@@ -10,7 +10,7 @@
 
 ```mermaid
 graph LR
-    subgraph Stage1["🔷 Stage 1: 이직 전 (2026)"]
+    subgraph Stage1["🔷 Stage 1: 이직 전 (2026~2027)"]
         P0[Phase 0: 환경 세팅]
         P1[Phase 1: 수학 핵심]
         P2[Phase 2: 컴퓨터 비전]
@@ -19,6 +19,7 @@ graph LR
         SLAM[ORB-SLAM3 개념]
         P7[Phase 7: Detection/Depth]
         P8[Phase 8: 3D Perception]
+        Blender[Blender 기초]
     end
     
     subgraph Career["🎯 Career"]
@@ -28,6 +29,7 @@ graph LR
     
     subgraph Stage2["🔶 Stage 2: 이직 후 (2027)"]
         BEV[BEV/Occupancy]
+        Isaac[Isaac Sim 연동]
         Multi[Multi-modal]
     end
     
@@ -38,8 +40,10 @@ graph LR
     
     P0 --> P1 --> P2 --> P3 --> P4
     P4 --> SLAM --> P7 --> P8
+    P8 -.-> Blender
+    Blender -.-> Isaac
     P8 --> Portfolio --> Job
-    Job --> BEV --> Multi
+    Job --> BEV --> Isaac --> Multi
     Multi --> VLA --> Embodied
 ```
 
@@ -56,8 +60,9 @@ graph LR
 | 2026.10 (2주) | Stage 1 | ORB-SLAM3 개념 | Loop Closing 이해 |
 | 2026.10-12 | Stage 1 | **Detection + Depth** | 2D Perception |
 | 2027.01-02 | Stage 1 | **3D Perception** | KITTI/nuScenes |
+| 2027.01-02 | 병행 | 🎨 **Blender 기초** | 시뮬레이션 에셋 |
 | 2027.03 | Stage 1 | 포트폴리오 | 이직 활동 |
-| 2027 중반~ | Stage 2 | BEV, Multi-modal | 이직 후 심화 |
+| 2027 중반~ | Stage 2 | BEV, Isaac Sim 연동 | 이직 후 심화 |
 | 2028~ | Stage 2+ | **VLA, Embodied AI** | 미래 역량 |
 
 ---
@@ -120,12 +125,28 @@ graph LR
 
 **산출물**: 카메라 기반 3D 객체 검출 데모
 
-### 포트폴리오 (12월)
+### 🎨 Blender for Simulation (Phase 8과 병행)
+> **목적**: Isaac Sim/Gazebo용 시뮬레이션 에셋 제작
+
+| 단계 | 내용 | 기간 | 산출물 |
+|------|------|------|--------|
+| 1 | 기초 UI, 모델링, 텍스처링 | 4주 | 장애물/박스 모델 |
+| 2 | Python API (Scripting) | 2주 | 자동화 스크립트 |
+| 3 | **Isaac Sim/Gazebo Export** | 2주 | USD/URDF 변환 |
+| 4 | Procedural Generation | 2주 (선택) | 다양한 에셋 자동 생성 |
+
+> 💡 **Phase 8의 3D 좌표계/투영 개념이 Blender 모델링에 바로 적용됨**  
+> 주말 2-3시간 병행 학습 권장
+
+**산출물**: Isaac Sim에서 사용 가능한 커스텀 로봇 환경 에셋
+
+### 포트폴리오 (2027.03)
 | 항목 | 내용 |
 |------|------|
 | GitHub | 학습 정리 + 데모 코드 |
 | 블로그 | 학습 여정 시리즈 |
 | 데모 영상 | Jetson 실시간 Perception |
+| **시뮬레이션** | Blender 에셋 + Isaac Sim 데모 |
 
 ---
 
@@ -140,6 +161,18 @@ graph LR
 | BEVFormer 심화 | Multi-camera → BEV |
 | Occupancy Network | 3D 공간 점유 예측 |
 | nuScenes 벤치마크 | 성능 평가 |
+
+### 🎮 Isaac Sim 연동 (2개월)
+> Blender 에셋을 활용한 시뮬레이션 환경 구축
+
+| 주제 | 내용 |
+|------|------|
+| Isaac Sim 기초 | 환경 세팅, USD 이해 |
+| Blender → Isaac | 커스텀 에셋 Import |
+| **Synthetic Data 생성** | Domain Randomization |
+| Perception 파이프라인 | 시뮬레이션 → 실제 전이 |
+
+> 💡 **Synthetic Data로 학습 데이터 무한 생성 가능!**
 
 ### Multi-modal Perception (3개월)
 | 주제 | 내용 |
@@ -208,7 +241,7 @@ graph LR
 
 ## ✅ 마일스톤 체크리스트
 
-### Stage 1 (2026년)
+### Stage 1 (2026~2027년)
 - [x] VINS-Fusion 실행 성공
 - [x] 수학 기초 이해
 - [ ] Phase 2 완료 (컴퓨터 비전)
@@ -216,11 +249,13 @@ graph LR
 - [ ] ORB-SLAM3 개념 이해
 - [ ] Phase 7 완료 (Detection/Depth)
 - [ ] Phase 8 완료 (3D Perception)
+- [ ] 🎨 Blender 기초 완료
 - [ ] 포트폴리오 완성
 - [ ] **이직 성공! 🎉**
 
 ### Stage 2 (2027년)
 - [ ] BEV Perception 심화
+- [ ] 🎮 Isaac Sim 연동
 - [ ] Multi-modal 학습
 - [ ] 시니어 성장
 
