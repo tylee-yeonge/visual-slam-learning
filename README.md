@@ -49,12 +49,15 @@ graph LR
 
 | 시기 | Stage | 내용 | 목표 |
 |------|-------|------|------|
-| 2026.01-05 | Stage 1 | Phase 0-4 (VIO) | SLAM 기초 이해 |
-| 2026.06 | Stage 1 | ORB-SLAM3 개념 (2주) | Loop Closing 이해 |
-| 2026.06-09 | Stage 1 | **Detection + Depth** | 2D Perception |
-| 2026.10-11 | Stage 1 | **3D Perception** | 이직 준비 완료 |
-| 2026.12 | Stage 1 | 포트폴리오 | 이직 활동 |
-| 2027 | Stage 2 | BEV, Multi-modal | 시니어 성장 |
+| 2026.01-02 | Stage 1 | Phase 1 (수학 핵심) | 3D 기하 이해 |
+| 2026.03-04 | Stage 1 | Phase 2 (CV 기초) | 카메라 모델 이해 |
+| 2026.05-06 | Stage 1 | Phase 3 (VO & BA) | 최적화 이해 |
+| 2026.07-09 | Stage 1 | Phase 4 (VIO 핵심) | Pre-integration |
+| 2026.10 (2주) | Stage 1 | ORB-SLAM3 개념 | Loop Closing 이해 |
+| 2026.10-12 | Stage 1 | **Detection + Depth** | 2D Perception |
+| 2027.01-02 | Stage 1 | **3D Perception** | KITTI/nuScenes |
+| 2027.03 | Stage 1 | 포트폴리오 | 이직 활동 |
+| 2027 중반~ | Stage 2 | BEV, Multi-modal | 이직 후 심화 |
 | 2028~ | Stage 2+ | **VLA, Embodied AI** | 미래 역량 |
 
 ---
@@ -86,28 +89,34 @@ graph LR
 - 면접에서 "ORB-SLAM3 구조 이해합니다" 정도면 충분
 
 ### Phase 7: Detection + Depth (3개월) ⭐
-> **핵심 Phase**
+> **핵심 Phase** - Detection + Depth 필수, Instance Seg 선택
 
-| 주차 | 내용 | 핵심 모델 |
-|------|------|----------|
-| 1-2 | PyTorch 복습 | - |
-| 3-4 | **YOLO 실습** | YOLOv8, RT-DETR |
-| 5-6 | Segmentation | SegFormer, SAM |
-| 7-8 | **Depth Estimation** | DPT, Depth Anything |
-| 9-10 | Instance Segmentation | Mask R-CNN |
-| 11-12 | **Jetson 배포** | TensorRT |
+| 주차 | 내용 | 핵심 모델 | 우선순위 |
+|------|------|----------|----------|
+| 1-2 | PyTorch 복습 | - | 필수 |
+| 3-4 | **YOLO 실습** | YOLOv8, RT-DETR | 필수 |
+| 5-6 | **Depth Estimation** | DPT, Depth Anything | 필수 |
+| 7-8 | Segmentation | SegFormer, SAM | 필수 |
+| 9-10 | **Jetson 배포** | TensorRT | 필수 |
+| 11-12 | Instance Segmentation | Mask R-CNN | ⚡선택 |
+
+> ⚠️ **TensorRT 배포는 삽질 시간이 예상보다 길어질 수 있음**  
+> Instance Seg은 시간 여유 있을 때 진행
 
 **산출물**: Jetson에서 실시간 Detection + Depth 데모
 
 ### Phase 8: 3D Perception (2개월) ⭐
-> **이직 준비 핵심**
+> **이직 준비 핵심** - KITTI 3D → nuScenes 순서로 진행
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
 | 1-2 | 3D Object Detection 개념 | 카메라 → 3D |
-| 3-4 | Monocular 3D Detection | FCOS3D |
-| 5-6 | **BEV 입문** | BEVFormer 개념 |
-| 7-8 | 실험 프로젝트 | nuScenes |
+| 3-4 | **KITTI 3D 실습** | 가벼운 데이터셋으로 먼저 |
+| 5-6 | Monocular 3D Detection | FCOS3D |
+| 7-8 | **nuScenes + BEV 입문** | BEVFormer 개념 |
+
+> 💡 **nuScenes (~400GB)는 셋업에만 며칠 걸릴 수 있음**  
+> KITTI 3D로 먼저 연습 후 nuScenes 진입 권장
 
 **산출물**: 카메라 기반 3D 객체 검출 데모
 
@@ -120,9 +129,10 @@ graph LR
 
 ---
 
-## 🔶 Stage 2: 이직 후 (2027년)
+## 🔶 Stage 2: 이직 후 (2027년 중반~)
 
-> 새 회사 적응 후 심화 학습
+> 새 회사 적응 기간 (3-6개월) 후 심화 학습 시작  
+> ⚠️ 이직 직후 바로 시작하지 말고 적응 기간 버퍼 확보
 
 ### BEV & Occupancy (3개월)
 | 주제 | 내용 |
