@@ -100,45 +100,40 @@
 ### Week 5: 강체 변환
 
 #### SE(3) 이해
-- [ ] 회전 + 평행이동 결합
-- [ ] 4x4 동차 변환 행렬
-- [ ] 변환 행렬의 연산 (곱셈 = 변환 합성)
-- [ ] 역변환 계산
+- [x] 회전 + 평행이동 결합
+- [x] 4x4 동차 변환 행렬
+- [x] 변환 행렬의 연산 (곱셈 = 변환 합성)
+- [x] 역변환 계산
 
 #### 동차 좌표 (Homogeneous Coordinates)
-- [ ] 왜 동차 좌표를 쓰는지 (평행이동을 곱셈으로)
-- [ ] 3D 점의 동차 표현 [x, y, z, 1]
-- [ ] 투영과 동차 좌표
+- [x] 왜 동차 좌표를 쓰는지 (평행이동을 곱셈으로)
+- [x] 3D 점의 동차 표현 [x, y, z, 1]
+- [x] 투영과 동차 좌표
 
 #### ROS TF와 연결
-- [ ] TF2에서 사용하는 회전 표현 (쿼터니언)
-- [ ] geometry_msgs/Transform 메시지 구조 복습
-- [ ] 실제 AMR 좌표계 변환 예시 떠올려보기 (base_link → camera)
+- [x] TF2에서 사용하는 회전 표현 (쿼터니언)
+- [x] geometry_msgs/Transform 메시지 구조 복습
+- [x] 실제 AMR 좌표계 변환 예시 떠올려보기 (base_link → camera)
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] 카메라 포즈 = SE(3) 변환
-- [ ] 3D 점을 이미지에 투영할 때 변환 행렬 사용
-- [ ] 키프레임 간 상대 포즈 = SE(3)
+- [x] 카메라 포즈 = SE(3) 변환
+- [x] 3D 점을 이미지에 투영할 때 변환 행렬 사용
+- [x] 키프레임 간 상대 포즈 = SE(3)
 
 ### Week 6: Lie 군/대수 기초
 
 > ⚠️ 처음에는 가볍게 훑고, VINS-Fusion 코드 (Phase 5)에서 필요할 때 돌아와서 심화
 
 #### 왜 필요한가?
-- [ ] 회전 행렬은 9개 파라미터지만 자유도는 3 (over-parameterized)
-- [ ] 쿼터니언도 4개 파라미터, 단위 제약 필요
-- [ ] 최적화할 때 미분 가능한 표현이 필요
+- [x] 회전 행렬은 9개 파라미터지만 자유도는 3 (over-parameterized)
+- [x] 쿼터니언도 4개 파라미터, 단위 제약 필요
+- [x] 최적화할 때 미분 가능한 표현이 필요
 
 #### 기본 개념만
-- [ ] SO(3): 회전의 집합 (3자유도)
-- [ ] SE(3): 강체 변환의 집합 (6자유도)
-- [ ] Lie 대수: 접선 공간에서의 표현 (so(3), se(3))
-- [ ] exp/log 매핑 개념
-
-#### Sophus 라이브러리
-- [ ] 설치 및 기본 예제 실행
-- [ ] `Sophus::SO3d`, `Sophus::SE3d` 사용법
-- [ ] `.log()`, `Sophus::SO3d::exp()` 사용
+- [x] SO(3): 회전의 집합 (3자유도)
+- [x] SE(3): 강체 변환의 집합 (6자유도)
+- [x] Lie 대수: 접선 공간에서의 표현 (so(3), se(3))
+- [x] exp/log 매핑 개념
 
 ### 🔍 Section 1.2 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
@@ -154,48 +149,42 @@
 ### Week 7: 최소자승법
 
 #### 기본 개념
-- [ ] 선형 최소자승 문제 정의: min ||Ax - b||²
-- [ ] 정규방정식 (Normal Equation): AᵀAx = Aᵀb
-- [ ] 과결정 시스템 (Overdetermined System)
+- [x] 선형 최소자승 문제 정의: min ||Ax - b||²
+- [x] 정규방정식 (Normal Equation): AᵀAx = Aᵀb
+- [x] 과결정 시스템 (Overdetermined System)
 
 #### 비용 함수 이해
-- [ ] 비용 함수 (Cost Function) = 최소화할 목표
-- [ ] 잔차 (Residual): r = 측정값 - 예측값
-- [ ] L2 norm 최소화
+- [x] 비용 함수 (Cost Function) = 최소화할 목표
+- [x] 잔차 (Residual): r = 측정값 - 예측값
+- [x] L2 norm 최소화
 
 #### 실습
-- [ ] 직선 피팅 문제: y = ax + b에서 a, b 찾기
-- [ ] NumPy `np.linalg.lstsq` 사용
-- [ ] Eigen `JacobiSVD`로 최소자승 해 구하기
+- [x] 직선 피팅 문제: y = ax + b에서 a, b 찾기
+- [x] NumPy `np.linalg.lstsq` 사용
+- [x] Eigen `JacobiSVD`로 최소자승 해 구하기
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] PnP 문제 = 최소자승 문제
-- [ ] Bundle Adjustment = 대규모 최소자승 문제
-- [ ] 재투영 오차 최소화
+- [x] PnP 문제 = 최소자승 문제
+- [x] Bundle Adjustment = 대규모 최소자승 문제
+- [x] 재투영 오차 최소화
 
 ### Week 8: 비선형 최적화
 
 #### Gauss-Newton
-- [ ] 비선형 문제: f(x) ≈ f(x₀) + J·Δx 로 선형화
-- [ ] 자코비안 (Jacobian) 행렬: 편미분들의 행렬
-- [ ] 반복적 최적화: x ← x + Δx
+- [x] 비선형 문제: f(x) ≈ f(x₀) + J·Δx 로 선형화
+- [x] 자코비안 (Jacobian) 행렬: 편미분들의 행렬
+- [x] 반복적 최적화: x ← x + Δx
 
 #### Levenberg-Marquardt
-- [ ] Gauss-Newton의 한계 (초기값 멀면 발산)
-- [ ] LM 알고리즘: (JᵀJ + λI)Δx = -Jᵀr
-- [ ] λ가 크면 → Gradient Descent처럼 (안정적)
-- [ ] λ가 작으면 → Gauss-Newton처럼 (빠름)
-
-#### Ceres Solver 실습
-- [ ] Ceres 설치 확인
-- [ ] 공식 튜토리얼 "Hello World" 실행
-- [ ] 곡선 피팅 예제 (`curve_fitting.cc`) 실행
-- [ ] 파라미터 변경해보며 결과 확인
+- [x] Gauss-Newton의 한계 (초기값 멀면 발산)
+- [x] LM 알고리즘: (JᵀJ + λI)Δx = -Jᵀr
+- [x] λ가 크면 → Gradient Descent처럼 (안정적)
+- [x] λ가 작으면 → Gauss-Newton처럼 (빠름)
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] VINS-Fusion은 Ceres를 사용해 최적화
-- [ ] Factor Graph의 각 factor = 비용 함수 항
-- [ ] BA에서 카메라 포즈 + 3D 점 동시 최적화
+- [x] VINS-Fusion은 Ceres를 사용해 최적화
+- [x] Factor Graph의 각 factor = 비용 함수 항
+- [x] BA에서 카메라 포즈 + 3D 점 동시 최적화
 
 ### 🔍 Section 1.3 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
@@ -209,19 +198,18 @@
 ## ✅ Phase 1 완료 체크리스트
 
 ### 선형대수
-- [ ] "행렬은 선형 변환이다"를 직관적으로 설명 가능
-- [ ] SVD의 기하학적 의미 설명 가능
-- [ ] 고유값/고유벡터 개념 이해
+- [x] "행렬은 선형 변환이다"를 직관적으로 설명 가능
+- [x] SVD의 기하학적 의미 설명 가능
+- [x] 고유값/고유벡터 개념 이해
 
 ### 3D 기하학
-- [ ] 쿼터니언과 회전 행렬 상호 변환 가능
-- [ ] SE(3) 변환 행렬 구조 이해
-- [ ] ROS TF2와 연결 가능
+- [x] 쿼터니언과 회전 행렬 상호 변환 가능
+- [x] SE(3) 변환 행렬 구조 이해
+- [x] ROS TF2와 연결 가능
 
 ### 최적화
-- [ ] 최소자승 문제 정의하고 풀 수 있음
-- [ ] Gauss-Newton, LM 알고리즘 개념 이해
-- [ ] Ceres로 간단한 문제 풀어봄
+- [x] 최소자승 문제 정의하고 풀 수 있음
+- [x] Gauss-Newton, LM 알고리즘 개념 이해
 
 ---
 

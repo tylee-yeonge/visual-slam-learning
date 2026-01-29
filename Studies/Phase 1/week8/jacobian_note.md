@@ -2,7 +2,7 @@
 
 ## 1. Jacobian이란 무엇인가?
 
-Jacobian(자코비안)은 **"다변수 함수를 1차 선형 근사(Linear Approximation)하기 위한 기울기 행렬"**입니다.
+Jacobian(자코비안)은 **"다변수 함수를 1차 선형 근사(Linear Approximation)하기 위한 기울기 행렬"** 입니다.
 단변수 함수 $y=f(x)$에서 기울기가 $\frac{dy}{dx}$라면, 다변수 벡터 함수 $\mathbf{y} = F(\mathbf{x})$에서는 Jacobian 행렬 $\mathbf{J}$가 그 역할을 합니다.
 
 $$ \mathbf{y}_{new} \approx \mathbf{y}_{old} + \mathbf{J} \cdot \Delta \mathbf{x} $$
@@ -11,12 +11,12 @@ $$ \mathbf{y}_{new} \approx \mathbf{y}_{old} + \mathbf{J} \cdot \Delta \mathbf{x
 
 ## 2. 왜 10x2 행렬인가?
 
-이 크기는 **"관측한 데이터의 개수"**와 **"최적화할 파라미터의 개수"**에 의해 결정됩니다.
+이 크기는 **"관측한 데이터의 개수"** 와 **"최적화할 파라미터의 개수"** 에 의해 결정됩니다.
 
 ### (1) 행(Row)의 의미: 데이터 포인트 (10개)
 우리는 $x$값 0부터 2까지 10개의 데이터를 가지고 있습니다.
 우리의 모델이 이 10개의 점 각각에 대해 예측값 $f(x_i)$를 내놓으므로, 오차(Residual)도 10개가 생깁니다.
-각 행은 **"특정 데이터 포인트 $i$에서의 변화"**를 나타냅니다.
+각 행은 **"특정 데이터 포인트 $i$에서의 변화"** 를 나타냅니다.
 
 ### (2) 열(Column)의 의미: 파라미터 (2개)
 우리가 조절할 수 있는 나사는 $a$와 $b$ 두 개뿐입니다.
@@ -25,7 +25,7 @@ $$ \mathbf{y}_{new} \approx \mathbf{y}_{old} + \mathbf{J} \cdot \Delta \mathbf{x
 *   **1열 ($\frac{\partial f}{\partial a}$)**: $a$를 아주 조금 바꿀 때, 10개의 예측값이 각각 어떻게 변하는가?
 *   **2열 ($\frac{\partial f}{\partial b}$)**: $b$를 아주 조금 바꿀 때, 10개의 예측값이 각각 어떻게 변하는가?
 
-결국 **(데이터 10개) $\times$ (파라미터 2개) = $10 \times 2$ 행렬**이 됩니다.
+결국 **(데이터 10개) $\times$ (파라미터 2개) = $10 \times 2$ 행렬** 이 됩니다.
 
 ---
 

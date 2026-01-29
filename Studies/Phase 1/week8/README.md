@@ -310,7 +310,324 @@ result = least_squares(
 
 ---
 
-### 7. SLAM에서의 활용
+### 7. Ceres Solver 설치 및 실습
+
+#### 7.1 설치 방법
+
+##### macOS
+
+```bash
+# Homebrew 사용
+brew install ceres-solver
+
+# 또는 소스에서 빌드
+git clone https://ceres-solver.googlesource.com/ceres-solver
+cd ceres-solver
+mkdir build && cd build
+cmake ..
+make -j4
+sudo make install
+```
+
+##### Ubuntu/Debian
+
+```bash
+# 의존성 설치
+sudo apt-get install cmake libgoogle-glog-dev libgflags-dev
+sudo apt-get install libatlas-base-dev libeigen3-dev libsuitesparse-dev
+
+# Ceres Solver 설치
+sudo apt-get install libceres-dev
+
+# 또는 소스에서 빌드
+git clone https://ceres-solver.googlesource.com/ceres-solver
+cd ceres-solver
+mkdir build && cd build
+cmake ..
+make -j4
+sudo make install
+```
+
+##### Windows
+
+```bash
+# vcpkg 사용 (권장)
+vcpkg install ceres
+
+# 또는 CMake GUI로 소스 빌드
+# https://github.com/ceres-solver/ceres-solver/releases
+```
+
+#### 7.2 기본 사용법
+
+##### 단계별 설명
+
+```
+┌─────────────────────────────────────────┐
+│      Ceres Solver 사용 흐름             │
+├─────────────────────────────────────────┤
+│                                         │
+│  1. 비용 함수 정의 (CostFunction)        │
+│     ↓                                   │
+│  2. Problem 객체 생성                   │
+│     ↓                                   │
+│  3. ResidualBlock 추가                  │
+│     ↓                                   │
+│  4. Solver Options 설정                 │
+│     ↓                                   │
+│  5. Solve() 실행                        │
+│     ↓                                   │
+│  6. Summary 확인                        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+##### 완전한 곡선 피팅 예제
+
+**문제**: y = a·e^(b·x) 형태의 곡선 피팅
+
+**curve_fitting.cpp**:
+
+```cpp
+#include <iostream>
+#include <ceres/ceres.h>
+#include <vector>
+#include <cmath>
+#include <random>
+
+// 1️⃣ 비용 함수 정의
+struct ExponentialResidual {
+    ExponentialResidual(double x, double y)
+        : x_(x), y_(y) {}
+    
+    // Ceres가 호출할 함수
+    // params[0] = a, params[1] = b
+    template <typename T>
+    bool operator()(const T* const params, T* residual) const {
+        // residual = 측정값 - 예측값
+        residual[0] = T(y_) - params[0] * exp(params[1] * T(x_));
+        return true;
+    }
+    
+    // Factory method for AutoDiffCostFunction
+    static ceres::CostFunction* Create(double x, double y) {
+        return new ceres::AutoDiffCostFunction<ExponentialResidual, 1, 2>(
+            new ExponentialResidual(x, y));
+    }
+    
+private:
+    const double x_;
+    const double y_;
+};
+
+int main() {
+    // 🎲 데이터 생성 (실제 값: a=2.5, b=0.3)
+    std::vector<double> x_data, y_data;
+    std::default_random_engine generator;
+    std::normal_distribution<double> noise(0.0, 0.1);
+    
+    const double true_a = 2.5;
+    const double true_b = 0.3;
+    
+    for (int i = 0; i < 50; ++i) {
+        double x = i * 0.1;
+        double y = true_a * exp(true_b * x) + noise(generator);
+        x_data.push_back(x);
+        y_data.push_back(y);
+    }
+    
+    // 2️⃣ 초기 추정값 (일부러 틀리게)
+    double params[2] = {1.0, 0.1};
+    
+    std::cout << "초기값: a = " << params[0] 
+              << ", b = " << params[1] << std::endl;
+    
+    // 3️⃣ Problem 생성
+    ceres::Problem problem;
+    
+    // 4️⃣ 각 데이터 포인트에 대해 ResidualBlock 추가
+    for (size_t i = 0; i < x_data.size(); ++i) {
+        ceres::CostFunction* cost_function = 
+            ExponentialResidual::Create(x_data[i], y_data[i]);
+        
+        problem.AddResidualBlock(
+            cost_function,      // 비용 함수
+            nullptr,            // loss function (nullptr = squared loss)
+            params);            // 최적화할 변수
+    }
+    
+    // 5️⃣ Solver 옵션 설정
+    ceres::Solver::Options options;
+    options.linear_solver_type = ceres::DENSE_QR;
+    options.minimizer_progress_to_stdout = true;
+    options.max_num_iterations = 100;
+    
+    // 6️⃣ 최적화 실행
+    ceres::Solver::Summary summary;
+    ceres::Solve(options, &problem, &summary);
+    
+    // 7️⃣ 결과 출력
+    std::cout << "\n" << summary.BriefReport() << "\n\n";
+    std::cout << "최적화 결과:\n";
+    std::cout << "  a = " << params[0] << " (실제: " << true_a << ")\n";
+    std::cout << "  b = " << params[1] << " (실제: " << true_b << ")\n";
+    
+    return 0;
+}
+```
+
+**CMakeLists.txt**:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(ceres_example)
+
+set(CMAKE_CXX_STANDARD 14)
+
+# Ceres 찾기
+find_package(Ceres REQUIRED)
+
+# 실행 파일
+add_executable(curve_fitting curve_fitting.cpp)
+target_link_libraries(curve_fitting Ceres::ceres)
+```
+
+**빌드 및 실행**:
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+./curve_fitting
+```
+
+**출력 예시**:
+
+```
+초기값: a = 1, b = 0.1
+
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  9.842456e+02    0.00e+00    1.23e+03   0.00e+00   0.00e+00  1.00e+04        0    1.23e-04    2.45e-04
+   1  1.234567e+01    9.72e+02    5.67e+01   1.23e+00   9.99e-01  3.00e+04        1    3.45e-04    5.92e-04
+   2  2.345678e+00    9.99e+00    1.23e+01   2.34e-01   9.99e-01  9.00e+04        1    2.12e-04    8.15e-04
+   ...
+  10  1.234567e-02    5.67e-03    1.23e-03   1.23e-04   1.00e+00  2.70e+08        1    1.98e-04    2.34e-03
+
+Ceres Solver Report: Iterations: 11, Initial cost: 9.842e+02, Final cost: 1.235e-02
+
+최적화 결과:
+  a = 2.498 (실제: 2.5)
+  b = 0.301 (실제: 0.3)
+```
+
+#### 7.3 핵심 개념 설명
+
+##### AutoDiffCostFunction
+
+```cpp
+// template <비용함수타입, 잔차차원, 파라미터1차원, 파라미터2차원, ...>
+ceres::AutoDiffCostFunction<ExponentialResidual, 1, 2>
+                                                  ↑  ↑
+                                                  │  └─ 2개 파라미터 (a, b)
+                                                  └─── 1차원 잔차 (scalar)
+```
+
+**자동 미분의 장점**:
+- 수동으로 Jacobian 계산 불필요
+- 실수 방지, 유지보수 쉬움
+- Jet 타입으로 forward automatic differentiation
+
+##### Loss Function
+
+```cpp
+// Squared Loss (기본)
+nullptr
+
+// Huber Loss (outlier 강건)
+new ceres::HuberLoss(1.0)
+
+// Cauchy Loss (더 강건)
+new ceres::CauchyLoss(1.0)
+```
+
+**언제 쓰나?**
+- `nullptr`: 데이터가 깨끗할 때
+- `HuberLoss`: SLAM에서 일반적 (outlier 있을 때)
+- `CauchyLoss`: outlier가 매우 많을 때
+
+##### Solver Options 주요 설정
+
+```cpp
+ceres::Solver::Options options;
+
+// 선형 솔버 선택
+options.linear_solver_type = ceres::DENSE_QR;        // 작은 문제
+options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;  // 큰 문제
+options.linear_solver_type = ceres::DENSE_SCHUR;     // Bundle Adjustment
+
+// Trust region 전략
+options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;  // 기본
+options.trust_region_strategy_type = ceres::DOGLEG;
+
+// 최대 반복 횟수
+options.max_num_iterations = 100;
+
+// 수렴 기준
+options.function_tolerance = 1e-6;
+options.gradient_tolerance = 1e-10;
+options.parameter_tolerance = 1e-8;
+
+// 로그 출력
+options.minimizer_progress_to_stdout = true;
+```
+
+#### 7.4 실전 팁
+
+##### ✅ Best Practices
+
+```cpp
+// 1. 좋은 초기값 제공
+double params[2] = {1.0, 0.1};  // ❌ 너무 멀 수 있음
+double params[2] = {2.0, 0.2};  // ✅ 대략적 사전 지식 활용
+
+// 2. 파라미터 범위 제한
+problem.SetParameterLowerBound(params, 0, 0.0);   // a > 0
+problem.SetParameterUpperBound(params, 0, 10.0);  // a < 10
+
+// 3. 특정 파라미터 고정
+problem.SetParameterBlockConstant(params);
+
+// 4. Loss function 사용 (outlier 대응)
+problem.AddResidualBlock(
+    cost_function,
+    new ceres::HuberLoss(1.0),  // ✅
+    params);
+```
+
+##### ⚠️ 주의사항
+
+```cpp
+// ❌ 잘못된 예: 메모리 관리
+ceres::CostFunction* cost = ExponentialResidual::Create(x, y);
+delete cost;  // ❌ Ceres가 자동으로 관리함!
+
+// ✅ 올바른 예
+problem.AddResidualBlock(cost, nullptr, params);
+// Ceres가 소멸자에서 자동 해제
+
+// ❌ 잘못된 예: 파라미터 범위
+double params[2];
+// ... solve ...
+// params가 스택 변수라면 함수 끝나면 소멸! 
+
+// ✅ 올바른 예: 충분한 생명주기 보장
+std::vector<double> params(2);
+// 또는 heap 할당
+```
+
+---
+
+### 8. SLAM에서의 활용
 
 #### Bundle Adjustment
 
@@ -421,7 +738,7 @@ ceres::Solve(options, &problem, &summary);
 | 4-5 | 확률/베이즈 | 가우시안, 추정 |
 | 6 | 3D 변환 | SO(3), SE(3), Lie |
 | 7 | 최소자승 | AᵀAx = Aᵀb |
-| **8** | **비선형 최적화** | **GN, LM, Ceres** |
+| **8** | **비선형 최적화** | **GN, LM, Ceres 설치/실습** |
 
 **다음: Phase 2 - 컴퓨터 비전 기초! 🚀**
 
